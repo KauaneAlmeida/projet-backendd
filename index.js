@@ -33,6 +33,9 @@ const CONFIG = {
   expressPort: process.env.PORT || 3000,
   
   // Google Cloud Storage settings
+// Define PORT constant for Cloud Run compatibility
+const PORT = process.env.PORT || CONFIG.expressPort || 8080;
+
   bucketName: process.env.SESSION_BUCKET, // REQUIRED: Set in Cloud Run
   sessionsPrefix: (process.env.SESSIONS_PREFIX || 'sessions/whatsapp-bot').replace(/\/+$/, '') + '/',
   
@@ -650,8 +653,8 @@ class BaileysWhatsAppBot {
     });
     
     // Start Express server
-    this.app.listen(CONFIG.expressPort, '0.0.0.0', () => {
-      this.logger.info('Express server started', {
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`🌐 Express server running on port ${PORT}`);
         port: CONFIG.expressPort,
         endpoints: ['/qr', '/health', '/send-message', '/api/qr-status', '/webhook-test']
       });
