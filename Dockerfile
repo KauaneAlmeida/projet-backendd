@@ -1,38 +1,40 @@
-# Imagem base Node.js
-FROM node:20-alpine
+# Use Node.js 18 LTS as base image
+FROM node:18-slim
 
-# Instalar curl (para healthcheck) e git (se precisar para dependências npm)
-RUN apk add --no-cache curl git
-
-# Criar diretório da aplicação
+# Set working directory
 WORKDIR /app
 
-# Criar usuário não-root
-RUN addgroup -g 1001 -S appuser && \
-    adduser -S -D -H -u 1001 -h /app -s /sbin/nologin -G appuser appuser
+# Install system dependencies for Baileys
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copiar package.json e package-lock.json
+# Copy package files
 COPY package*.json ./
 
-# Instalar dependências
-RUN npm install --omit=dev && npm cache clean --force
+# Install Node.js dependencies
+RUN npm ci --only=production && npm cache clean --force
 
-# Copiar o restante do código
-COPY . .
+# Copy application code
+COPY index.js ./
 
-# Dar permissão ao usuário
-RUN mkdir -p /app/whatsapp_session && \
-    chown -R appuser:appuser /app
-
-# Trocar para usuário não-root
+# Create non-root user for security
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+RUN chown -R appuser:appuser /app
 USER appuser
 
-# Expor a porta que o Cloud Run usa (8080)
-EXPOSE 8080
+# Expose port (Cloud Run will set PORT env var)
+EXPOSE 3000
 
-# Healthcheck opcional (ping no endpoint /health)
-HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=3 \
-  CMD curl -f http://localhost:${PORT:-8080}/health || exit 1
+# Set default environment variables
+ENV NODE_ENV=production
+ENV PORT=3000
 
-# Comando para rodar o bot
-CMD ["node", "whatsapp_baileys.js"]
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:${PORT}/health || exit 1
+
+# Start the application
+CMD ["npm", "start"]

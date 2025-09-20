@@ -1,18 +1,32 @@
 {
-  "name": "whatsapp-bot",
-  "private": true,
+  "name": "whatsapp-bot-baileys",
+  "version": "1.0.0",
+  "description": "Production WhatsApp Bot using Baileys for Google Cloud Run",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "node index.js"
   },
+  "keywords": [
+    "whatsapp",
+    "bot",
+    "baileys",
+    "cloud-run",
+    "google-cloud"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
   "dependencies": {
-    "@google-cloud/storage": "^7.17.1",
-    "@whiskeysockets/baileys": "^6.7.19",
-    "express": "^4.21.2",
-    "node-fetch": "^3.3.2",
-    "qrcode": "^1.5.4",
-    "qrcode-terminal": "^0.12.0",
+    "@whiskeysockets/baileys": "^6.7.8",
     "@hapi/boom": "^10.0.1",
-    "pino": "^9.4.0"
+    "express": "^4.18.2",
+    "qrcode": "^1.5.3",
+    "qrcode-terminal": "^0.12.0",
+    "pino": "^8.15.0",
+    "pino-pretty": "^10.2.0",
+    "@google-cloud/storage": "^7.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
