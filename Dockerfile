@@ -9,16 +9,18 @@ RUN apt-get update && apt-get install -y \
     python3 \
     make \
     g++ \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy package files
 COPY package*.json ./
 
-# Install Node.js dependencies
-RUN npm ci --only=production && npm cache clean --force
+# Install Node.js dependencies (production only)
+RUN npm install --production && npm cache clean --force
 
 # Copy application code
 COPY index.js ./
+COPY test-endpoints.js ./
 
 # Create non-root user for security
 RUN groupadd -r appuser && useradd -r -g appuser appuser
